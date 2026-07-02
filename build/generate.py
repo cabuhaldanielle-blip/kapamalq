@@ -22,7 +22,7 @@ files = sorted(os.listdir(SRC_IMGS))
 by_page = defaultdict(list)
 hashes = {}
 for f in files:
-    m = re.match(r"p-(\d+)-\d+\.(png|jpg)", f)
+    m = re.match(r"p-(\d+)-\d+\.(png|jpe?g)", f)
     if not m:
         continue
     page = int(m.group(1))
