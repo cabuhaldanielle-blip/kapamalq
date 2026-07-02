@@ -78,29 +78,21 @@ CAPTIONS = {
     51: ["Figure 45.0 Main Page (Reporting Section)", "Figure 45.1 ADD ACCOUNT TITLE Page"],
     52: ["Figure 46.0 Main Page (Reporting Section)", "Figure 46.1 FINANCIAL STATEMENTS Page"],
     53: ["Figure 47.0 Main Page (Payroll Section)", "Figure 47.1 PAYROLL REPORTS Page", "Figure 48.0 Main Page (Payroll Section)", "Figure 48.1 STATEMENT OF DEDUCTIONS Page"],
-    54: ["Figure 49.x List of Loans", "Figure 49.0 Main Page (Scanned Files Page)", "Figure 49.1 SCANNED FILES Directory Page", "Figure 50.0 Main Page (Bottom Right Section)"],
+    54: ["Figure 49.0 Main Page (Scanned Files Page)", "Figure 49.1 SCANNED FILES Directory Page", "Figure 50.0 Main Page (Bottom Right Section)"],
     55: ["Figure 50.1 RENEW LIST Viewing Page", "Figure 51.0 Main Page (Bottom Right Section)", "Figure 51.1 LOAN AMORT LIST Page", "Figure 52.0 Main Page (Bottom Right Section)"],
-    56: ["Figure 52.1 MEMBERSHIP LIST Page", "Figure 53.0 Main Page (Bottom Right Section)", "Figure 53.1 KYC SUMMARY Page", "Figure 54.1 UPDATE BOARD MEMBERS Page"],
+    56: ["Figure 52.1 MEMBERSHIP LIST Page", "Figure 53.0 Main Page (Bottom Right Section)", "Figure 53.1 KYC SUMMARY Page", "Figure 54.0 Main Page (Bottom Right Section)", "Figure 54.1 UPDATE BOARD MEMBERS Page"],
 }
 
-# Pair captions with images per page: "Main Page" captions get repeated
-# (main-screenshot) images; the rest are paired in document order.
-FIG = {}  # caption -> filename
-for page, caps in CAPTIONS.items():
-    imgs = by_page.get(page, [])
-    main_imgs = [f for f in imgs if f in REPEATED]
-    other_imgs = [f for f in imgs if f not in REPEATED]
-    mi, oi = iter(main_imgs), iter(other_imgs)
-    for cap in caps:
-        pool = mi if "Main Page" in cap else oi
-        try:
-            FIG[cap] = next(pool)
-        except StopIteration:
-            alt = oi if pool is mi else mi
-            try:
-                FIG[cap] = next(alt)
-            except StopIteration:
-                pass
+# Pair captions with images in global document order. In the PDF every
+# figure caption sits directly below its image, so the Nth caption belongs
+# to the Nth image. The only images without captions are the installation
+# screenshots on pages 7 and 10, which are excluded here.
+UNCAPTIONED_PAGES = {7, 10}
+ordered_caps = [cap for page in sorted(CAPTIONS) for cap in CAPTIONS[page]]
+ordered_imgs = [f for page in sorted(by_page) if page not in UNCAPTIONED_PAGES
+                for f in by_page[page] if page >= 13]
+assert len(ordered_caps) == len(ordered_imgs), (len(ordered_caps), len(ordered_imgs))
+FIG = dict(zip(ordered_caps, ordered_imgs))
 
 def fig_html(cap):
     f = FIG.get(cap)
@@ -581,7 +573,7 @@ g.append(guide("LIII", "kyc-summary", "KYC Summary",
 g.append(guide("LIV", "update-board", "Update Board Members",
     ["To access the update board members page, simply click the <strong>UPDATE BOARD MEMBERS</strong> button.",
      "The UPDATE BOARD MEMBERS page shall be used if there are newly appointed board members. If there are new members, the staff can simply select the position and replace the name. Once done, click the <strong>SAVE</strong> button."],
-    ["Figure 54.1 UPDATE BOARD MEMBERS Page"]))
+    ["Figure 54.0 Main Page (Bottom Right Section)", "Figure 54.1 UPDATE BOARD MEMBERS Page"]))
 parts.append(sec("using-the-system", "Using the KAPAMALQ System", "".join(g)))
 
 def qa(pairs):
