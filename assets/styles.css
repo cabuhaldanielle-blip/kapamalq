@@ -179,6 +179,7 @@ figcaption {
 
 footer { text-align: center; color: var(--muted); font-size: 13px; }
 
+#lightbox[hidden] { display: none; }
 #lightbox {
   position: fixed;
   inset: 0;
